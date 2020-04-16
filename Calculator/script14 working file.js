@@ -7,9 +7,9 @@ let salaryAmountRemake = document.querySelector('.salary-amount');
 let incomeItemsRemake = document.querySelectorAll('.income-items'),
     incomeTitleRemake = document.querySelector('.income-title'),
     incomeAmountRemake = document.querySelector('.income-amount');
-//Возможный доход
-let additionalIncomeRemake = document.querySelectorAll('.additional_income'),
-    additionalIncomeTitleRemake = document.querySelectorAll('.additional_income-item')[0],
+//Возможный доход 
+let additionalIncomeRemake = document.querySelectorAll('.additional_income'), 
+    addIncItem = document.querySelectorAll('.additional_income-item'), 
     additionalIncomeAmountRemake = document.querySelectorAll('.additional_income-item')[1];
 // Обязательные расходы
 let expensesItemsRemake = document.querySelectorAll('.expenses-items'),
@@ -35,11 +35,11 @@ let btnExpAdd = document.querySelector('.expenses_add'),
 
 //БЛОК РЕЗУЛЬТАТЫ
 let budgetMonthValueRemake = document.querySelector('.budget_month-value'), //Доход за месяц
-    budgetDayValueRemake = document.querySelector('.budget_day-value'), //Дневной бюджет
-    expensesMonthValueRemake = document.querySelector('.expenses_month-value'), //Расход за месяц
-    addIncomeValueRemake = document.querySelector('.additional_income-value'), //Возможные доходы
+    budgetDayValueRemake = document.querySelector('.result-budget_day input'), //Дневной бюджет
+    expensesMonthValueRemake = document.querySelector('.result-expenses_month input'), //Расход за месяц СТРАННАЯ ЗАПИСЬ!!!
+    addIncomeValueRemake = document.querySelector('.result-additional_income input'), //Возможные доходы
     addExpValueRemake = document.querySelector('.additional_expenses-value'), //Возможные расходы
-    incomePeriodValueRemake = document.querySelector('.income_period-value'), //Накопления за период
+    incPeriodValueRemake = document.querySelector('.income_period-value'), //Накопления за период
     targetMonthValueRemake = document.querySelector('.target_month-value'); //Срок достижения цели в месяцах
 
 //Запуск/отмена
@@ -128,20 +128,22 @@ AppData.prototype.addIncomeBlock = function(){
     }
 };
 AppData.prototype.getExpenses = function(){ 
+    const _this = this;
     expensesItemsRemake.forEach(function(item){ 
      let itemExpenses = item.querySelector('.expenses-title').value;
      let cashExpenses = item.querySelector('.expenses-amount').value; 
         if(itemExpenses !== '' && cashExpenses !== ''){ 
-           appData.expenses[itemExpenses] = cashExpenses; 
+            _this.expenses[itemExpenses] = cashExpenses; 
         }
     });
 };
 AppData.prototype.getIncome = function(){ //Получение доп доходов.
+    const _this = this;
     incomeItemsRemake.forEach(function(item){
         let itemIncome = item.querySelector('.income-title').value;
         let cashIncome = item.querySelector('.income-amount').value;
          if(itemIncome !== '' && cashIncome !== ''){
-             appData.income[itemIncome] = cashIncome;
+            _this.income[itemIncome] = cashIncome;
          }
     });
     for (let key in this.income){
@@ -150,19 +152,20 @@ AppData.prototype.getIncome = function(){ //Получение доп доход
 };
 AppData.prototype.getAddExpenses = function(){ 
     let addExpenses = addExpItem.value.split(',');
+    const _this = this;
     addExpenses.forEach(function(item){ 
         item = item.trim();
         if(item !== ''){
-            appData.addExpenses.push(item);
+            _this.addExpenses.push(item);
         }
     });
 };
 AppData.prototype.getAddIncome = function(){ //получение Возможных доходов. Просто наводим красоту.
-    let addIncItem = additionalIncomeTitleRemake.value.trim();
+    const _this = this;
     addIncItem.forEach(function(item){
-        item = item.trim();
+        let itemValue = item.value.trim();
         if (item !== ''){
-            appData.addIncome.push(item);
+            _this.addIncome.push(item);
         }
     });
 };
@@ -179,11 +182,11 @@ AppData.prototype.getTargetMonth = function () {
     return targetAmountRemake.value / this.budgetMonth;
 };
 AppData.prototype.getStatusIncome = function () {
-    if (this.budgetDay > 800) {
+    if (this.budgetDay >= 800) {
         return ('Высокий уровень дохода');
-    } else if (this.budgetDay > 300) {
+    } else if (this.budgetDay >= 300 && this.budgetDay < 800) {
         return ('Средний уровень дохода');
-    } else if (this.budgetDay > 0) {
+    } else if (this.budgetDay > 0 && this.budgetDay < 300) {
         return ('Низкий уровень дохода');
     } else {
         return('Что-то пошло не так!');
@@ -203,7 +206,7 @@ AppData.prototype.getInfoDeposit = function(){
 AppData.prototype.calcPeriod = function (){
     return this.budgetMonth * periodSelectRemake.value;
 };
-AppData.prototype.reset = function(event){
+AppData.prototype.reset = function(){
     let inputTextData = document.querySelectorAll('.data input[type="text"]');
     let resultInputAll = document.querySelectorAll('.result input[type="text"]'); 
 
@@ -219,6 +222,10 @@ AppData.prototype.reset = function(event){
     for (let i = 1; i < incomeItemsRemake.length; i++){
         incomeItemsRemake[i].parentNode.removeChild(incomeItemsRemake[i]);
         btnIncAdd.style.display = 'block';
+    }
+    for (let i = 1; i < expensesItemsRemake.length; i++){
+        expensesItemsRemake[i].parentNode.removeChild(expensesItemsRemake[i]);
+        btnExpAdd.style.display = 'block';
     }
     this.budget = 0;         
     this.budgetDay = 0;
@@ -239,43 +246,39 @@ AppData.prototype.reset = function(event){
     btnExpAdd.removeAttribute('disabled');
     checkBox.checked = false;   
 };
-AppData.prototype.eventsListeners = function(event, target, action){
-    if (event) {
-        return `${target}.addEventListener(${event}, ${action})`;
-    }
-
-};
-AppData.prototype.listOfEventListeners = function(target){
-    // if (expensesTitleRemake) { return expensesTitleRemake.addEventListener('keyup', AppData.blockInput)};
-    // if (target = )    return incomeTitleRemake.addEventListener('keyup', AppData.blockInput);
-
-    // if (target = )    return incomeAmountRemake.addEventListener('keyup', AppData.blockincomeAmount);
-    // if (target = )    return additionalIncomeAmountRemake.addEventListener('keyup', AppData.blockadditionalIncomeAmount);
-    // if (target = )    return expensesAmountRemake.addEventListener('keyup', AppData.blockexpensesAmount);
-    // if (target = )    return targetAmountRemake.addEventListener('keyup', AppData.blocktargetAmount);
-    // if (target = )    return periodAmountRemake.addEventListener('keyup', AppData.blockperiodAmount);
-    // if (target = )    return btnExpAdd.addEventListener('click', AppData.addExpensesBlock);
-    // if (target = )    return btnIncAdd.addEventListener('click', AppData.addIncomeBlock);
-
-    if (target === startRemake) return startRemake.addEventListener('click', AppData.startingSet);
-    // if (target = )    return cancelRemake.addEventListener('click', AppData.reset);
-};
-
-expensesTitleRemake.addEventListener('keyup', AppData.blockInput);
-incomeTitleRemake.addEventListener('keyup', AppData.blockInput);
-
-incomeAmountRemake.addEventListener('keyup', AppData.blockincomeAmount);
-additionalIncomeAmountRemake.addEventListener('keyup', AppData.blockadditionalIncomeAmount);
-expensesAmountRemake.addEventListener('keyup', AppData.blockexpensesAmount);
-targetAmountRemake.addEventListener('keyup', AppData.blocktargetAmount);
-periodAmountRemake.addEventListener('keyup', AppData.blockperiodAmount);
-btnExpAdd.addEventListener('click', AppData.addExpensesBlock); //Активация плюсиков
-btnIncAdd.addEventListener('click', AppData.addIncomeBlock);
-
-startRemake.addEventListener('click', AppData.startingSet);
-cancelRemake.addEventListener('click', AppData.reset);
-
 
 const appDataRemake = new AppData();
 console.log(appDataRemake);
+//ВЫЗВАТЬ ФУНКЦИЮ EVENTADDbn   b
+
+startRemake.addEventListener('click', AppData.start);
+btnExpAdd.addEventListener('click', AppData.addExpensesBlock); //Активация плюсиков
+btnIncAdd.addEventListener('click', AppData.addIncomeBlock);
+salaryAmountRemake.addEventListener('keyup', AppData.check);
+cancelRemake.addEventListener('click', AppData.reset);
+periodSelectRemake.addEventListener('change', function(){
+    periodAmountRemake.innerHTML = periodSelectRemake.value;
+});
+
+let addExp = [];
+for (let i = 0; i < appDataRemake.addExpenses.length; i++){
+    let element = appDataRemake.addExpenses[i].trim();
+    element = element.charAt(0).toUpperCase() + element.substing(1).toLowerCase();
+    addExp.push(element);
+}
+// expensesTitleRemake.addEventListener('keyup', AppData.blockInput);
+// incomeTitleRemake.addEventListener('keyup', AppData.blockInput);
+
+// incomeAmountRemake.addEventListener('keyup', AppData.blockincomeAmount);
+// additionalIncomeAmountRemake.addEventListener('keyup', AppData.blockadditionalIncomeAmount);
+// expensesAmountRemake.addEventListener('keyup', AppData.blockexpensesAmount);
+// targetAmountRemake.addEventListener('keyup', AppData.blocktargetAmount);
+// periodAmountRemake.addEventListener('keyup', AppData.blockperiodAmount);
+
+
+
+
+
+
+
 
