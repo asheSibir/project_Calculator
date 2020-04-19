@@ -64,13 +64,14 @@ const appData = {
         periodAmount.innerHTML = periodSelect.value;
     },
     addBlock: function(){
+        const _this = this;
         let clone = expensesItemsBlock.cloneNode(true);
         expensesItemsBlock.after(clone);
         clone.classList.add('clone');
         let inputs = clone.querySelectorAll('[type="text"]');
         inputs[0].value = '';
         inputs[1].value = '';
-        inputs[1].addEventListener('keyup', appData.controlAmounts);
+        inputs[1].addEventListener('keyup', _this.controlAmounts);
         let blocks = document.querySelectorAll('.expenses-items');
         if (blocks.length > 2) {
             btnExpAdd.style.display = 'none';
@@ -86,7 +87,7 @@ const appData = {
     },
     getBudget: function(){
         let arg1 = salaryAmount.value / 1;
-        let arg2 = appData.getExpenses();
+        let arg2 = this.getExpenses();
         return arg1 - arg2;
     },
     
@@ -98,6 +99,7 @@ const appData = {
         timeTarget.value = Math.ceil(targetAmount.value / appData.getBudget());
     },
     changeButton: function(event){
+        const _this = this;
         let userDataBlock = document.querySelector('.data'),
             userData = userDataBlock.querySelectorAll('input');
         if(event.target === start){
@@ -108,6 +110,12 @@ const appData = {
             start.style.display = 'block';
             cancel.style.display = 'none';
             userData.forEach((elem) => elem.removeAttribute('disabled'));
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach((elem) => elem.value = '');
+            const tip = expensesItemsBlock.querySelectorAll('.redText');
+            tip.forEach((tip) => tip.remove());
+            periodSelect.value = 0;
+            periodAmount.innerHTML = 0;
         }
         
     }
